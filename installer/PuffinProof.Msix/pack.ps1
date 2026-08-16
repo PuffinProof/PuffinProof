@@ -36,7 +36,7 @@ $utf8 = New-Object System.Text.UTF8Encoding $false
 Add-Type -AssemblyName System.Drawing
 $iconSource = Join-Path $root "branding\app-icon.jpg"
 if (-not (Test-Path $iconSource)) {
-    $iconSource = Join-Path $root "branding\mascots\mascot-puffin.jpg"
+    $iconSource = Join-Path $root "branding\mascot-puffin.jpg"
 }
 function Save-Png([int]$size, [string]$name) {
     $bmp = New-Object System.Drawing.Bitmap($size, $size)
