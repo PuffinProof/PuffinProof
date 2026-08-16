@@ -31,7 +31,7 @@ Add a word from the popup so it is never flagged again. Ignore it once for the r
 
 ## Privacy
 
-All checking runs on your PC. The dictionary is a local Hunspell word list. Settings and your custom words live in `%AppData%\JustSpell\`. Nothing is uploaded.
+All checking runs on your PC. The dictionary is a local Hunspell word list. Settings and your custom words live in `%AppData%\PuffinProof\`. Nothing is uploaded.
 
 Password boxes (Win32 `ES_PASSWORD` / class names containing “Password”) are skipped. Password managers are skipped by default. Use **Pause in this app** from the tray if you want PuffinProof out of a specific program.
 
@@ -48,22 +48,22 @@ Needs the **.NET 10 Desktop Runtime (x64)** from Microsoft (~1 MB PuffinProof pa
 ### Stub EXE (latest from GitHub)
 
 ```
-dist\JustSpellSetup.exe
+dist\PuffinProofSetup.exe
 ```
 
-Checks GitHub Releases for `JustSpell.msix` and installs it only if you are behind. Or pick a local MSIX.
+Checks GitHub Releases for `PuffinProof.msix` and installs it only if you are behind. Or pick a local MSIX.
 
-Set `src/JustSpell.Stub/feed.json` or `$env:JUSTSPELL_GITHUB_REPO="PuffinProof/PuffinProof"`.
+Set `src/PuffinProof.Stub/feed.json` or `$env:PUFFINPROOF_GITHUB_REPO="PuffinProof/PuffinProof"`.
 
 ### MSIX + App Installer
 
 ```
-dist\JustSpell.msix
-dist\JustSpell.appinstaller
+dist\PuffinProof.msix
+dist\PuffinProof.appinstaller
 ```
 
 ```powershell
-Add-AppxPackage -Path dist\JustSpell.msix -AllowUnsigned
+Add-AppxPackage -Path dist\PuffinProof.msix -AllowUnsigned
 ```
 
 ### winget
@@ -73,7 +73,7 @@ winget validate installer\winget
 winget install --manifest installer\winget
 ```
 
-Point `installer/winget/JustSpell.yaml` at a real Release URL first.
+Point `installer/winget/PuffinProof.yaml` at a real Release URL first.
 
 ### Build
 
@@ -89,7 +89,7 @@ CI tests every push/PR. **Release** workflow (tag `v*` or Run workflow) publishe
 
 ## Add another language
 
-Drop a Hunspell `xx_YY.dic` + `xx_YY.aff` pair into `src/JustSpell/Dictionaries/` (or next to the published exe, in a `Dictionaries` folder) and pick it in Settings. American English (`en_US`, SCOWL) ships with the app.
+Drop a Hunspell `xx_YY.dic` + `xx_YY.aff` pair into `src/PuffinProof/Dictionaries/` (or next to the published exe, in a `Dictionaries` folder) and pick it in Settings. American English (`en_US`, SCOWL) ships with the app.
 
 ## How it works
 
@@ -107,16 +107,16 @@ It cannot draw a red underline *inside* another program. The popup is the proces
 ## License
 
 - PuffinProof application code: [MIT](LICENSE)
-- English word list: [SCOWL / Hunspell en_US](src/JustSpell/Dictionaries/README_en_US.txt)
+- English word list: [SCOWL / Hunspell en_US](src/PuffinProof/Dictionaries/README_en_US.txt)
 - Spell engine: [WeCantSpell.Hunspell](https://github.com/aarondandy/WeCantSpell.Hunspell) (Hunspell MPL / LGPL / GPL tri-license)
 
 ## Project layout
 
 ```
-src/JustSpell.Core          spell engine, settings, user dictionary
-src/JustSpell               tray app, UI Automation watcher, settings
-src/JustSpell.Stub          small EXE that pulls the latest MSIX from GitHub
-installer/JustSpell.Msix    MakeAppx layout + App Installer
+src/PuffinProof.Core          spell engine, settings, user dictionary
+src/PuffinProof               tray app, UI Automation watcher, settings
+src/PuffinProof.Stub          small EXE that pulls the latest MSIX from GitHub
+installer/PuffinProof.Msix    MakeAppx layout + App Installer
 installer/winget            winget manifest
-tests/JustSpell.Tests
+tests/PuffinProof.Tests
 ```

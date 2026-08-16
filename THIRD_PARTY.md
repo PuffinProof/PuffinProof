@@ -9,7 +9,7 @@ Used for dictionary loading, word checks, and suggestions.
 
 ## en_US Hunspell dictionary (SCOWL)
 
-Bundled as `src/JustSpell/Dictionaries/en_US.dic` and `en_US.aff`.
+Bundled as `src/PuffinProof/Dictionaries/en_US.dic` and `en_US.aff`.
 
 - Source: LibreOffice dictionaries / SCOWL (http://wordlist.sourceforge.net)
-- Full terms: `src/JustSpell/Dictionaries/README_en_US.txt`
+- Full terms: `src/PuffinProof/Dictionaries/README_en_US.txt`

@@ -12,7 +12,7 @@ dist/
 # Published installer trees (rebuilt by pack.ps1)
 installer/payload/
 installer/payload-fd/
-installer/JustSpell.Msix/layout/
+installer/PuffinProof.Msix/layout/
 
 TestResults/
 *.trx

@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PuffinProof.Core/PuffinProof.Core.csproj" />
+    <Project Path="src/PuffinProof/PuffinProof.csproj" />
+    <Project Path="src/PuffinProof.Stub/PuffinProof.Stub.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PuffinProof.Tests/PuffinProof.Tests.csproj" />
+  </Folder>
+</Solution>

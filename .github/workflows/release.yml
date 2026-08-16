@@ -45,15 +45,15 @@ jobs:
           Write-Host "Version $v (build resets each UTC day)"
 
       - name: Test
-        run: dotnet test JustSpell.slnx -c Release
+        run: dotnet test PuffinProof.slnx -c Release
 
       - name: Publish stub
         shell: pwsh
         run: |
-          @{ githubRepo = $env:GITHUB_REPOSITORY; assetName = "JustSpell.msix" } |
+          @{ githubRepo = $env:GITHUB_REPOSITORY; assetName = "PuffinProof.msix" } |
             ConvertTo-Json |
-            Set-Content src/JustSpell.Stub/feed.json
-          dotnet publish src/JustSpell.Stub/JustSpell.Stub.csproj -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true /p:DebugType=none -p:CalVerYear=${{ env.CalVerYear }} -p:CalVerMonth=${{ env.CalVerMonth }} -p:CalVerDay=${{ env.CalVerDay }} -p:BuildNumber=${{ env.BuildNumber }} -o dist/stub
+            Set-Content src/PuffinProof.Stub/feed.json
+          dotnet publish src/PuffinProof.Stub/PuffinProof.Stub.csproj -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true /p:DebugType=none -p:CalVerYear=${{ env.CalVerYear }} -p:CalVerMonth=${{ env.CalVerMonth }} -p:CalVerDay=${{ env.CalVerDay }} -p:BuildNumber=${{ env.BuildNumber }} -o dist/stub
 
       - name: Pack MSIX
         env:
@@ -61,12 +61,12 @@ jobs:
           CalVerYear: ${{ env.CalVerYear }}
           CalVerMonth: ${{ env.CalVerMonth }}
           CalVerDay: ${{ env.CalVerDay }}
-        run: powershell -NoProfile -ExecutionPolicy Bypass -File installer/JustSpell.Msix/pack.ps1
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File installer/PuffinProof.Msix/pack.ps1
 
       - name: Stage artifacts
         shell: pwsh
         run: |
-          Copy-Item dist/stub/JustSpellSetup.exe dist/JustSpellSetup.exe -Force
+          Copy-Item dist/stub/PuffinProofSetup.exe dist/PuffinProofSetup.exe -Force
           Copy-Item dist/stub/feed.json dist/feed.json -Force
           Get-ChildItem dist -File |
             ForEach-Object { "$(Get-FileHash $_.FullName -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  $($_.Name)" } |
@@ -76,8 +76,8 @@ jobs:
       - uses: actions/attest-build-provenance@v2
         with:
           subject-path: |
-            dist/JustSpellSetup.exe
-            dist/JustSpell.msix
+            dist/PuffinProofSetup.exe
+            dist/PuffinProof.msix
 
       - name: Publish GitHub Release
         env:
@@ -86,12 +86,12 @@ jobs:
         run: |
           $tag = "v$env:DISPLAY_VERSION"
           $notes = @"
-          JustSpell $env:DISPLAY_VERSION
+          PuffinProof $env:DISPLAY_VERSION
 
-          - Stub: JustSpellSetup.exe — checks this repo and installs the MSIX if you are behind
-          - MSIX / App Installer: JustSpell.msix, JustSpell.appinstaller
+          - Stub: PuffinProofSetup.exe — checks this repo and installs the MSIX if you are behind
+          - MSIX / App Installer: PuffinProof.msix, PuffinProof.appinstaller
 
-          Verify: ``gh attestation verify JustSpell.msix --repo $env:GITHUB_REPOSITORY``
+          Verify: ``gh attestation verify PuffinProof.msix --repo $env:GITHUB_REPOSITORY``
           "@
           if ($env:GITHUB_REF -notlike "refs/tags/v*") {
             git config user.name "github-actions[bot]"
@@ -100,4 +100,4 @@ jobs:
             git push origin $tag
           }
           gh release create $tag --title $tag --notes $notes `
-            dist/JustSpellSetup.exe dist/JustSpell.msix dist/JustSpell.appinstaller dist/feed.json dist/SHA256SUMS.txt
+            dist/PuffinProofSetup.exe dist/PuffinProof.msix dist/PuffinProof.appinstaller dist/feed.json dist/SHA256SUMS.txt
