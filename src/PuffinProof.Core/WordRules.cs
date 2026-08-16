@@ -44,6 +44,11 @@ public static class WordRules
             return true;
         }
 
+        if (word.Length > settings.MaxWordLength)
+        {
+            return true;
+        }
+
         if (!word.Any(char.IsLetter))
         {
             return true;
@@ -110,5 +115,66 @@ public static class WordRules
         }
 
         return suggestion;
+    }
+
+    public static bool IsSafeLanguageId(string language)
+    {
+        if (string.IsNullOrWhiteSpace(language) || language.Length is < 2 or > 12)
+        {
+            return false;
+        }
+
+        var underscore = 0;
+        foreach (var c in language)
+        {
+            if (c == '_')
+            {
+                underscore++;
+                continue;
+            }
+
+            if (!char.IsAsciiLetterOrDigit(c))
+            {
+                return false;
+            }
+        }
+
+        return underscore <= 1 && language[0] != '_' && language[^1] != '_';
+    }
+
+    public static bool IsUnderDirectory(string path, string directory)
+    {
+        var root = Path.GetFullPath(directory)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            + Path.DirectorySeparatorChar;
+        var full = Path.GetFullPath(path);
+        return full.StartsWith(root, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool IsSafeReplacement(string word)
+    {
+        if (string.IsNullOrWhiteSpace(word) || word.Length > 64)
+        {
+            return false;
+        }
+
+        var letters = 0;
+        foreach (var c in word)
+        {
+            if (char.IsLetter(c))
+            {
+                letters++;
+                continue;
+            }
+
+            if (c is '\'' or '\u2019' or '-')
+            {
+                continue;
+            }
+
+            return false;
+        }
+
+        return letters > 0;
     }
 }

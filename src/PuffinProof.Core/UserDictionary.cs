@@ -26,7 +26,7 @@ public sealed class UserDictionary
         foreach (var line in File.ReadAllLines(_path))
         {
             var word = line.Trim();
-            if (word.Length > 0 && !word.StartsWith('#'))
+            if (WordRules.IsSafeReplacement(word))
             {
                 _words.Add(word);
             }
@@ -38,7 +38,7 @@ public sealed class UserDictionary
     public bool Add(string word)
     {
         word = word.Trim();
-        if (word.Length == 0 || !_words.Add(word))
+        if (!WordRules.IsSafeReplacement(word) || !_words.Add(word))
         {
             return false;
         }

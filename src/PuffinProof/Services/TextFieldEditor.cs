@@ -8,8 +8,8 @@ public static class TextFieldEditor
     public static bool TryReplace(object elementObj, FieldWord word, string replacement)
     {
         if (elementObj is not AutomationElement element ||
-            string.IsNullOrEmpty(replacement) ||
-            string.IsNullOrEmpty(word.Word))
+            string.IsNullOrEmpty(word.Word) ||
+            !WordRules.IsSafeReplacement(replacement))
         {
             return false;
         }

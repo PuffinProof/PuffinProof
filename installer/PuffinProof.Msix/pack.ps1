@@ -34,14 +34,26 @@ $utf8 = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText((Join-Path $layout "AppxManifest.xml"), $manifest.Trim(), $utf8)
 
 Add-Type -AssemblyName System.Drawing
+$iconSource = Join-Path $root "branding\app-icon.jpg"
+if (-not (Test-Path $iconSource)) {
+    $iconSource = Join-Path $root "branding\mascots\mascot-puffin.jpg"
+}
 function Save-Png([int]$size, [string]$name) {
     $bmp = New-Object System.Drawing.Bitmap($size, $size)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.Clear([System.Drawing.Color]::FromArgb(247, 244, 239))
-    $brush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(196, 69, 54))
-    $g.FillEllipse($brush, [int]($size * 0.2), [int]($size * 0.55), [int]($size * 0.6), [int]($size * 0.18))
+    $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+    if (Test-Path $iconSource) {
+        $src = [System.Drawing.Image]::FromFile($iconSource)
+        $g.DrawImage($src, 0, 0, $size, $size)
+        $src.Dispose()
+    }
+    else {
+        $brush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(196, 69, 54))
+        $g.FillEllipse($brush, [int]($size * 0.2), [int]($size * 0.55), [int]($size * 0.6), [int]($size * 0.18))
+        $brush.Dispose()
+    }
     $g.Dispose()
-    $brush.Dispose()
     $bmp.Save((Join-Path $layout "Assets\$name"), [System.Drawing.Imaging.ImageFormat]::Png)
     $bmp.Dispose()
 }

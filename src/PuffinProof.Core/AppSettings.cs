@@ -14,6 +14,8 @@ public sealed class AppSettings
 
     public int MinWordLength { get; set; } = 2;
 
+    public int MaxWordLength { get; set; } = 48;
+
     public List<string> ExcludedProcesses { get; set; } =
     [
         "keepass",
@@ -44,6 +46,16 @@ public sealed class AppSettings
         if (MinWordLength < 1)
         {
             MinWordLength = 1;
+        }
+
+        if (MaxWordLength < MinWordLength)
+        {
+            MaxWordLength = Math.Max(MinWordLength, 48);
+        }
+
+        if (MaxWordLength > 64)
+        {
+            MaxWordLength = 64;
         }
 
         if (string.IsNullOrWhiteSpace(Language))

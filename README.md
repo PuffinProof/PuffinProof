@@ -1,5 +1,9 @@
 # PuffinProof
 
+<p align="center">
+  <img src="branding/github-social.jpg" alt="PuffinProof mascot drawing a red underline" width="720">
+</p>
+
 **Spellcheck for every Windows app. Nothing else.**
 
 PuffinProof is an open-source, local-only alternative to Grammarly that does **one job**: catch spelling mistakes as you type, in any application. The mascot redlines. It does not rewrite.
@@ -37,7 +41,7 @@ Password boxes (Win32 `ES_PASSWORD` / class names containing “Password”) are
 
 PuffinProof cannot see keystrokes in elevated (Administrator) windows unless you also run it as Administrator. Prefer leaving it unelevated.
 
-PuffinProof never sends text off the machine. It does not install a keyboard hook.
+PuffinProof never sends text off the machine. It does not install a keyboard hook. See [SECURITY.md](SECURITY.md) if you want to report a problem.
 
 ## Install it (Windows)
 

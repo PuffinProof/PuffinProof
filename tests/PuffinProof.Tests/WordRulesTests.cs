@@ -37,6 +37,33 @@ public class WordRulesTests
         Assert.Equal(expected, WordRules.ApplyCapitalization(original, suggestion));
     }
 
+    [Theory]
+    [InlineData("the", true)]
+    [InlineData("well-known", true)]
+    [InlineData("don't", true)]
+    [InlineData("a<script>", false)]
+    [InlineData("C:\\Windows", false)]
+    public void Replacements_are_sanitized(string word, bool ok)
+    {
+        Assert.Equal(ok, WordRules.IsSafeReplacement(word));
+    }
+
+    [Fact]
+    public void Long_replacements_are_rejected()
+    {
+        Assert.False(WordRules.IsSafeReplacement(new string('x', 65)));
+    }
+
+    [Theory]
+    [InlineData("en_US", true)]
+    [InlineData("fr", true)]
+    [InlineData("..\\evil", false)]
+    [InlineData("en/US", false)]
+    public void Language_ids_are_constrained(string id, bool ok)
+    {
+        Assert.Equal(ok, WordRules.IsSafeLanguageId(id));
+    }
+
     [Fact]
     public void Enter_is_a_commit_delimiter()
     {

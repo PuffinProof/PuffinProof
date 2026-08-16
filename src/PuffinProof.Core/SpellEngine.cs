@@ -30,8 +30,19 @@ public sealed class SpellEngine
 
     public static SpellEngine Load(string dictionariesDirectory, string language, UserDictionary user)
     {
-        var dic = Path.Combine(dictionariesDirectory, language + ".dic");
-        var aff = Path.Combine(dictionariesDirectory, language + ".aff");
+        if (!WordRules.IsSafeLanguageId(language))
+        {
+            throw new InvalidOperationException($"Language '{language}' is not a valid dictionary id.");
+        }
+
+        var root = Path.GetFullPath(dictionariesDirectory);
+        var dic = Path.GetFullPath(Path.Combine(root, language + ".dic"));
+        var aff = Path.GetFullPath(Path.Combine(root, language + ".aff"));
+        if (!WordRules.IsUnderDirectory(dic, root) || !WordRules.IsUnderDirectory(aff, root))
+        {
+            throw new InvalidOperationException("Dictionary files must stay inside the bundled Dictionaries folder.");
+        }
+
         if (!File.Exists(dic) || !File.Exists(aff))
         {
             throw new FileNotFoundException(
@@ -87,7 +98,7 @@ public sealed class SpellEngine
             }
 
             var adjusted = WordRules.ApplyCapitalization(word, suggestion);
-            if (!seen.Add(adjusted))
+            if (!WordRules.IsSafeReplacement(adjusted) || !seen.Add(adjusted))
             {
                 continue;
             }

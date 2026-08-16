@@ -17,7 +17,7 @@ public sealed class GitHubRelease
 
     public static async Task<GitHubRelease?> FetchLatestAsync(FeedConfig feed, CancellationToken token)
     {
-        if (string.IsNullOrWhiteSpace(feed.GithubRepo) || !feed.GithubRepo.Contains('/'))
+        if (!IsSafeRepo(feed.GithubRepo))
         {
             return null;
         }
@@ -51,7 +51,7 @@ public sealed class GitHubRelease
             }
 
             var download = asset.GetProperty("browser_download_url").GetString();
-            if (string.IsNullOrWhiteSpace(download))
+            if (!IsAllowedDownloadUrl(download))
             {
                 continue;
             }
@@ -76,6 +76,11 @@ public sealed class GitHubRelease
 
     public static async Task<string> DownloadAsync(string url, IProgress<double>? progress, CancellationToken token)
     {
+        if (!IsAllowedDownloadUrl(url))
+        {
+            throw new InvalidOperationException("Download URL is not a GitHub release asset.");
+        }
+
         using var client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("PuffinProofSetup", "1.0"));
         using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
@@ -99,5 +104,31 @@ public sealed class GitHubRelease
         }
 
         return dest;
+    }
+
+    internal static bool IsSafeRepo(string? repo)
+    {
+        if (string.IsNullOrWhiteSpace(repo))
+        {
+            return false;
+        }
+
+        var parts = repo.Trim().Split('/');
+        return parts.Length == 2
+               && parts.All(static part =>
+                   part.Length is > 0 and <= 100
+                   && part.All(static c => char.IsAsciiLetterOrDigit(c) || c is '.' or '_' or '-'));
+    }
+
+    internal static bool IsAllowedDownloadUrl(string? url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+        {
+            return false;
+        }
+
+        return uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
+               || uri.Host.Equals("objects.githubusercontent.com", StringComparison.OrdinalIgnoreCase)
+               || uri.Host.Equals("release-assets.githubusercontent.com", StringComparison.OrdinalIgnoreCase);
     }
 }
