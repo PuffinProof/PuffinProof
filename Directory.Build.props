@@ -1,0 +1,18 @@
+<Project>
+  <!--
+    year.month.day.build  e.g. 2026.8.16.1
+    Build restarts at 1 each UTC day (scripts/Get-DailyBuildNumber.ps1 / CI).
+    Four numeric parts only — .NET and MSIX reject hex letters (A, F, …).
+    After 99 we keep going 100, 101, … up to 65535.
+  -->
+  <PropertyGroup>
+    <BuildNumber Condition="'$(BuildNumber)' == ''">1</BuildNumber>
+    <CalVerYear Condition="'$(CalVerYear)' == ''">$([System.DateTime]::UtcNow.Year)</CalVerYear>
+    <CalVerMonth Condition="'$(CalVerMonth)' == ''">$([System.DateTime]::UtcNow.Month)</CalVerMonth>
+    <CalVerDay Condition="'$(CalVerDay)' == ''">$([System.DateTime]::UtcNow.Day)</CalVerDay>
+    <Version>$(CalVerYear).$(CalVerMonth).$(CalVerDay).$(BuildNumber)</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+  </PropertyGroup>
+</Project>

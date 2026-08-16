@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/JustSpell.Core/JustSpell.Core.csproj" />
+    <Project Path="src/JustSpell/JustSpell.csproj" />
+    <Project Path="src/JustSpell.Stub/JustSpell.Stub.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JustSpell.Tests/JustSpell.Tests.csproj" />
+  </Folder>
+</Solution>

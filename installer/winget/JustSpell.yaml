@@ -1,0 +1,24 @@
+# After a GitHub Release exists, set InstallerUrl and InstallerSha256.
+# winget validate installer\winget
+# winget install --manifest installer\winget
+PackageIdentifier: JustSpell.JustSpell
+PackageVersion: 2026.8.16.1
+PackageLocale: en-US
+Publisher: JustSpell
+PackageName: JustSpell
+License: MIT
+ShortDescription: Spellcheck for every Windows app. Nothing else.
+Description: Local-only spellcheck. No rewriting, no coaching, no cloud.
+Moniker: justspell
+Tags:
+  - spellcheck
+  - spelling
+  - hunspell
+Installers:
+  - Architecture: x64
+    InstallerType: msix
+    InstallerUrl: https://github.com/OWNER/REPO/releases/download/v2026.8.16.1/JustSpell.msix
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    PackageFamilyName: JustSpell_1e1e1e1e1e1e1
+ManifestType: singleton
+ManifestVersion: 1.6.0

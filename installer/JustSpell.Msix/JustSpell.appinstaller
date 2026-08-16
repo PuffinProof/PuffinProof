@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+    Uri="https://github.com/OWNER/REPO/releases/latest/download/JustSpell.appinstaller"
+    Version="1.0.0.0"
+    xmlns="http://schemas.microsoft.com/appx/appinstaller/2018">
+  <MainPackage
+      Name="JustSpell"
+      Publisher="CN=JustSpell"
+      Version="1.0.0.0"
+      ProcessorArchitecture="x64"
+      Uri="https://github.com/OWNER/REPO/releases/latest/download/JustSpell.msix" />
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="24" ShowPrompt="true" />
+  </UpdateSettings>
+</AppInstaller>
