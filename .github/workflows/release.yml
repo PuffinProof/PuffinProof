@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Compute daily version
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ($env:GITHUB_REF -like "refs/tags/v*") {
+            $v = $env:GITHUB_REF_NAME.TrimStart("v")
+            $p = $v.Split(".")
+          } else {
+            $d = [DateTime]::UtcNow
+            $n = & ./scripts/Get-DailyBuildNumber.ps1 -Year $d.Year -Month $d.Month -Day $d.Day
+            $p = @("$($d.Year)", "$($d.Month)", "$($d.Day)", "$n")
+            $v = $p -join "."
+          }
+          if ($p.Length -lt 4) { throw "Version must be year.month.day.build, got $v" }
+          "DISPLAY_VERSION=$v" >> $env:GITHUB_ENV
+          "CalVerYear=$($p[0])" >> $env:GITHUB_ENV
+          "CalVerMonth=$($p[1])" >> $env:GITHUB_ENV
+          "CalVerDay=$($p[2])" >> $env:GITHUB_ENV
+          "BuildNumber=$($p[3])" >> $env:GITHUB_ENV
+          Write-Host "Version $v (build resets each UTC day)"
+
+      - name: Test
+        run: dotnet test PuffinProof.slnx -c Release
+
+      - name: Publish stub
+        shell: pwsh
+        run: |
+          @{ githubRepo = $env:GITHUB_REPOSITORY; assetName = "PuffinProof.msix" } |
+            ConvertTo-Json |
+            Set-Content src/PuffinProof.Stub/feed.json
+          dotnet publish src/PuffinProof.Stub/PuffinProof.Stub.csproj -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true /p:DebugType=none -p:CalVerYear=${{ env.CalVerYear }} -p:CalVerMonth=${{ env.CalVerMonth }} -p:CalVerDay=${{ env.CalVerDay }} -p:BuildNumber=${{ env.BuildNumber }} -o dist/stub
+
+      - name: Pack MSIX
+        env:
+          BuildNumber: ${{ env.BuildNumber }}
+          CalVerYear: ${{ env.CalVerYear }}
+          CalVerMonth: ${{ env.CalVerMonth }}
+          CalVerDay: ${{ env.CalVerDay }}
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File installer/PuffinProof.Msix/pack.ps1
+
+      - name: Stage artifacts
+        shell: pwsh
+        run: |
+          Copy-Item dist/stub/PuffinProofSetup.exe dist/PuffinProofSetup.exe -Force
+          Copy-Item dist/stub/feed.json dist/feed.json -Force
+          Get-ChildItem dist -File |
+            ForEach-Object { "$(Get-FileHash $_.FullName -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  $($_.Name)" } |
+            Set-Content dist/SHA256SUMS.txt
+          Get-Content dist/SHA256SUMS.txt
+
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/PuffinProofSetup.exe
+            dist/PuffinProof.msix
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "v$env:DISPLAY_VERSION"
+          $notes = @"
+          PuffinProof $env:DISPLAY_VERSION
+
+          - Stub: PuffinProofSetup.exe — checks this repo and installs the MSIX if you are behind
+          - MSIX / App Installer: PuffinProof.msix, PuffinProof.appinstaller
+
+          Verify: ``gh attestation verify PuffinProof.msix --repo $env:GITHUB_REPOSITORY``
+          "@
+          if ($env:GITHUB_REF -notlike "refs/tags/v*") {
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag $tag
+            git push origin $tag
+          }
+          gh release create $tag --title $tag --notes $notes `
+            dist/PuffinProofSetup.exe dist/PuffinProof.msix dist/PuffinProof.appinstaller dist/feed.json dist/SHA256SUMS.txt

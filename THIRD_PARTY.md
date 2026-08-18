@@ -1,0 +1,18 @@
+# Third-party notices
+
+PuffinProof application code is under the [GNU GPLv3](LICENSE).
+The components below keep their own licenses. This file does not replace them.
+
+## WeCantSpell.Hunspell
+
+Used for dictionary loading, word checks, and suggestions.
+
+- https://github.com/aarondandy/WeCantSpell.Hunspell
+- License: Hunspell MPL / LGPL / GPL tri-license (see the package `license.txt`)
+
+## en_US Hunspell dictionary (SCOWL)
+
+Bundled as `src/PuffinProof/Dictionaries/en_US.dic` and `en_US.aff`.
+
+- Source: LibreOffice dictionaries / SCOWL (http://wordlist.sourceforge.net)
+- Full terms: `src/PuffinProof/Dictionaries/README_en_US.txt`
